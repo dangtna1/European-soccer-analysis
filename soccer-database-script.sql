@@ -1,9 +1,12 @@
+-- drop database
+drop database if exists soccer;
+
 -- create database
 create database if not exists soccer;
 
-
 -- use database
 use soccer;
+SET FOREIGN_KEY_CHECKS = 0; -- because our data is not full
 
 -- ----------------------------------------------------------------------------------------
 
@@ -108,36 +111,36 @@ create table if not exists `match` (
 	`cross` text,
 	corner text,
 	possession text,
-	B365H numeric,
-	B365D numeric,
-	B365A numeric,
-	BWH numeric,
-	BWD numeric,
-	BWA numeric,
-	IWH numeric,
-	IWD numeric,
-	IWA numeric,
-	LBH numeric,
-	LBD numeric,
-	LBA numeric,
-	PSH numeric,
-	PSD numeric,
-	PSA numeric,
-	WHH numeric,
-	WHD numeric,
-	WHA numeric,
-	SJH numeric,
-	SJD numeric,
-	SJA numeric,
-	VCH numeric,
-	VCD numeric,
-	VCA numeric,
-	GBH numeric,
-	GBD numeric,
-	GBA numeric,
-	BSH numeric,
-	BS numeric,
-	BSA numeric,
+	B365H numeric(10,2),
+	B365D numeric(10,2),
+	B365A numeric(10,2),
+	BWH numeric(10,2),
+	BWD numeric(10,2),
+	BWA numeric(10,2),
+	IWH numeric(10,2),
+	IWD numeric(10,2),
+	IWA numeric(10,2),
+	LBH numeric(10,2),
+	LBD numeric(10,2),
+	LBA numeric(10,2),
+	PSH numeric(10,2),
+	PSD numeric(10,2),
+	PSA numeric(10,2),
+	WHH numeric(10,2),
+	WHD numeric(10,2),
+	WHA numeric(10,2),
+	SJH numeric(10,2),
+	SJD numeric(10,2),
+	SJA numeric(10,2),
+	VCH numeric(10,2),
+	VCD numeric(10,2),
+	VCA numeric(10,2),
+	GBH numeric(10,2),
+	GBD numeric(10,2),
+	GBA numeric(10,2),
+	BSH numeric(10,2),
+	BS numeric(10,2),
+	BSA numeric(10,2),
 	primary key(id),
 	foreign key(league_id) references league(id)
 );
@@ -270,4 +273,11 @@ alter table `match`
 
 -- ----------------------------------------------------------------------------------------
 
-
+-- query tables
+select * from country;
+select * from league;
+select * from `match`;
+select * from player;
+select * from player_attributes;
+select * from team;
+select * from team_attributes;
