@@ -2,14 +2,14 @@ use soccer;
 
 -- ----------------------------------------------------------------------------------------
 
--- Query attributes of a specific player
+# Query attributes of a specific player
 select *
 from player_attributes
 where player_api_id = 505942;
 
 -- ----------------------------------------------------------------------------------------
 
--- Inspect how many records and unique players
+# Inspect how many records and unique players
 select count(*) as all_records, count(distinct(player_api_id)) as unique_players
 from player_attributes;
 
@@ -18,7 +18,7 @@ select * from player_attributes order by player_api_id;
 
 -- ----------------------------------------------------------------------------------------
 
--- Inspect attributes of individual player by the latest date (using sub-query)
+# Inspect attributes of individual player by the latest date (using sub-query)
 create view players_data as (
 select 
 	p.*,
@@ -99,7 +99,7 @@ end //
 
 delimiter ;
 
-call top10Players('overall_rating');
+call top10Players('potential');
 
 -- ----------------------------------------------------------------------------------------
 
@@ -115,4 +115,56 @@ select
     round(avg(shot_power)) as avg_shot_power
 from players_data
 group by preferred_foot;
+
+-- ----------------------------------------------------------------------------------------
+
+# Inspect attributes of individual team by the latest date (using sub-query)
+create view teams_data as (
+	select 
+		t.team_short_name,
+        t.team_long_name,
+		lta.*
+    from team t
+    inner join (
+		select 
+		ta.*
+		from 
+			team_attributes as ta
+		inner join (
+			select 
+				team_api_id,
+				max(date) as latest_date 
+			from team_attributes
+			group by team_api_id
+		) as latest_data 
+		on ta.team_api_id = latest_data.team_api_id
+		and ta.date = latest_data.latest_date
+	) as lta 
+    on t.team_api_id = lta.team_api_id
+);
+
+select * from teams_data;
+
+-- ----------------------------------------------------------------------------------------
+
+# top 10 teams in terms of different attributes (using procedure)
+delimiter //
+
+create procedure top10Teams(in attribute varchar(50))
+begin
+	set @query = concat(
+		'select team_long_name, ', attribute,
+        ' from teams_data',
+        ' order by ', attribute, ' desc',
+        ' limit 10;'
+    );
+    prepare stmt from @query;
+    execute stmt;
+    deallocate prepare stmt;
+end //
+
+delimiter ;
+
+call top10Teams('buildUpPlayPassing');
+
 
