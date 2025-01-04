@@ -167,4 +167,48 @@ delimiter ;
 
 call top10Teams('buildUpPlayPassing');
 
+-- ----------------------------------------------------------------------------------------
 
+# find the average attributes for each league
+select 
+	m.league_id,
+    l.name,
+    avg(td.buildUpPlaySpeed) as avg_buildUpPlaySpeed,
+    avg(td.buildUpPlayPassing) avg_buildUpPlayPassing,
+--     td.buildUpPlayPassingClass,
+--     td.buildUpPlayPositioningClass,
+    avg(td.chanceCreationCrossing) avg_chanceCreationCrossing,
+--     td.chanceCreationCrossingClass,
+    avg(td.chanceCreationShooting) as avg_chanceCreationShooting,
+--     td.chanceCreationShootingClass,
+    avg(td.defenceAggression) as avg_defenceAggression,
+--     td.defenceAggressionClass,
+    avg(td.defenceTeamWidth) as defenceTeamWidth
+--     td.defenceTeamWidthClass,
+--     td.defenceDefenderLineClass,
+from teams_data td
+inner join `match` m
+on td.team_api_id = m.home_team_api_id
+inner join league l
+on m.league_id = l.id
+group by m.league_id;
+
+-- ----------------------------------------------------------------------------------------
+
+# find the mode (most frequent nominal value) for each attribute in every league (apply CTE)
+with rankedBuildUpplayPassingClass as (
+	SELECT 
+		m.league_id,
+		td.buildUpPlayPassingClass,
+		COUNT(td.buildUpPlayPassingClass) AS frequency,
+		RANK() OVER (PARTITION BY m.league_id ORDER BY COUNT(td.buildUpPlayPassingClass) DESC) AS ranking
+	from teams_data td
+	inner join `match` m
+	on td.team_api_id = m.home_team_api_id
+	inner join league l
+	on m.league_id = l.id
+	group by m.league_id, td.buildUpPlayPassingClass
+)
+select league_id, buildUpPlayPassingClass
+from rankedBuildUpplayPassingClass
+where ranking = 1;
