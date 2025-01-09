@@ -175,16 +175,13 @@ select
     l.name,
     avg(td.buildUpPlaySpeed) as avg_buildUpPlaySpeed,
     avg(td.buildUpPlayPassing) avg_buildUpPlayPassing,
---     td.buildUpPlayPassingClass,
 --     td.buildUpPlayPositioningClass,
     avg(td.chanceCreationCrossing) avg_chanceCreationCrossing,
 --     td.chanceCreationCrossingClass,
     avg(td.chanceCreationShooting) as avg_chanceCreationShooting,
---     td.chanceCreationShootingClass,
     avg(td.defenceAggression) as avg_defenceAggression,
 --     td.defenceAggressionClass,
     avg(td.defenceTeamWidth) as defenceTeamWidth
---     td.defenceTeamWidthClass,
 --     td.defenceDefenderLineClass,
 from teams_data td
 inner join `match` m
@@ -197,8 +194,9 @@ group by m.league_id;
 
 # find the mode (most frequent nominal value) for each attribute in every league (apply CTE)
 with rankedBuildUpplayPassingClass as (
-	SELECT 
+	select 
 		m.league_id,
+        l.name,
 		td.buildUpPlayPassingClass,
 		COUNT(td.buildUpPlayPassingClass) AS frequency,
 		RANK() OVER (PARTITION BY m.league_id ORDER BY COUNT(td.buildUpPlayPassingClass) DESC) AS ranking
@@ -209,6 +207,48 @@ with rankedBuildUpplayPassingClass as (
 	on m.league_id = l.id
 	group by m.league_id, td.buildUpPlayPassingClass
 )
-select league_id, buildUpPlayPassingClass
+select league_id, name, buildUpPlayPassingClass
 from rankedBuildUpplayPassingClass
 where ranking = 1;
+
+-- ----------------------------------------------------------------------------------------
+
+with rankedchanceCreationCrossingClass as (
+	select 
+		m.league_id,
+		l.name,
+		td.chanceCreationCrossingClass,
+		count(*) as frequency,
+		rank() over (partition by league_id order by count(*) desc) as ranking
+	from teams_data td
+	inner join `match` m
+	on td.team_api_id = m.home_team_api_id
+	inner join league l
+	on m.league_id = l.id
+	group by m.league_id, td.chanceCreationCrossingClass
+)
+select league_id, name, chanceCreationCrossingClass
+from rankedchanceCreationCrossingClass
+where ranking = 1;
+
+-- ----------------------------------------------------------------------------------------
+
+# try finding the second most common defenceTeamWidthClass (if exists) for each league
+with rankedDefenceTeamWidthClass as (
+	select 
+		m.league_id,
+        l.name,
+		td.defenceTeamWidthClass,
+		count(*) as frequency,
+		rank() over (partition by league_id order by count(*) desc) as ranking
+	from teams_data td
+	inner join `match` m
+	on td.team_api_id = m.home_team_api_id
+	inner join league l
+	on m.league_id = l.id
+	group by m.league_id, td.defenceTeamWidthClass
+)
+select league_id, name, defenceTeamWidthClass
+from rankedDefenceTeamWidthClass
+where ranking = 2;
+	
