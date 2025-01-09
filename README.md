@@ -1,6 +1,6 @@
 # European Soccer Analysis
 
-## Summary:
+## Summary
 * Designed and implemented a relational database for analyzing soccer match data, including player and team attributes, using MySQL.
 * Created dynamic SQL procedures and views to generate insights on top players, teams, and attribute comparisons.
 * Leveraged data aggregation and filtering to analyze player performance trends and team strategies.
@@ -20,5 +20,5 @@
     | Team              | 296        | 5             |
     | Team_Attributes   | 1458       | 25            |
 
-## Schema diagram    
+## Schema diagram
 ![soccer-schema-diagram](image.png)
