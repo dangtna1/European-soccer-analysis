@@ -281,3 +281,8 @@ select * from player;
 select * from player_attributes;
 select * from team;
 select * from team_attributes;
+
+# find out the number of attributes (columns) of `match` table
+SELECT COUNT(*) AS attribute_count
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'match';
