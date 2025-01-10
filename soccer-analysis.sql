@@ -175,14 +175,10 @@ select
     l.name,
     avg(td.buildUpPlaySpeed) as avg_buildUpPlaySpeed,
     avg(td.buildUpPlayPassing) avg_buildUpPlayPassing,
---     td.buildUpPlayPositioningClass,
     avg(td.chanceCreationCrossing) avg_chanceCreationCrossing,
---     td.chanceCreationCrossingClass,
     avg(td.chanceCreationShooting) as avg_chanceCreationShooting,
     avg(td.defenceAggression) as avg_defenceAggression,
---     td.defenceAggressionClass,
     avg(td.defenceTeamWidth) as defenceTeamWidth
---     td.defenceDefenderLineClass,
 from teams_data td
 inner join `match` m
 on td.team_api_id = m.home_team_api_id
@@ -229,6 +225,66 @@ with rankedchanceCreationCrossingClass as (
 )
 select league_id, name, chanceCreationCrossingClass
 from rankedchanceCreationCrossingClass
+where ranking = 1;
+
+-- ----------------------------------------------------------------------------------------
+
+with rankedDefenceAggressionClass as (
+	select 
+		m.league_id,
+		l.name,
+		td.defenceAggressionClass,
+		count(*) as frequency,
+		rank() over (partition by league_id order by count(*) desc) as ranking
+	from teams_data td
+	inner join `match` m
+	on td.team_api_id = m.home_team_api_id
+	inner join league l
+	on m.league_id = l.id
+	group by m.league_id, td.defenceAggressionClass
+)
+select league_id, name, defenceAggressionClass
+from rankedDefenceAggressionClass
+where ranking = 1;
+
+-- ----------------------------------------------------------------------------------------
+
+with rankedbuildUpPlayPositioningClass as (
+	select 
+		m.league_id,
+        l.name,
+        td.buildUpPlayPositioningClass,
+        count(*) as frequency,
+        rank() over (partition by m.league_id order by count(*) desc) as ranking
+	from teams_data td
+	inner join `match` m
+	on td.team_api_id = m.home_team_api_id
+	inner join league l
+	on m.league_id = l.id
+	group by m.league_id, td.buildUpPlayPositioningClass
+)
+select league_id, name, buildUpPlayPositioningClass
+from rankedbuildUpPlayPositioningClass
+where ranking = 1;
+
+-- ----------------------------------------------------------------------------------------
+
+with rankedDefenceDefenderLineClass as (
+	select 
+		m.league_id,
+        l.name,
+        td.defenceDefenderLineClass,
+        count(*) as frequency,
+        rank() over (partition by m.league_id order by count(*) desc) as ranking
+	from teams_data td
+	inner join `match` m
+	on td.team_api_id = m.home_team_api_id
+	inner join league l
+	on m.league_id = l.id
+	group by m.league_id, td.defenceDefenderLineClass
+)
+select league_id, name, defenceDefenderLineClass
+from rankedDefenceDefenderLineClass
 where ranking = 1;
 
 -- ----------------------------------------------------------------------------------------
